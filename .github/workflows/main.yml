@@ -1,0 +1,30 @@
+name: Run Non-Functional Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  non-functional-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up JMeter
+      run: |
+        wget -q https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.4.1.tgz
+        tar -xf apache-jmeter-5.4.1.tgz
+        export PATH=$PATH:$PWD/apache-jmeter-5.4.1/bin/
+
+    - name: Run JMeter tests
+      run: |
+        jmeter -n -t jmeter-tests/your_test.jmx -l results.jtl
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: results.jtl
